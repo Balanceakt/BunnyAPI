@@ -1,0 +1,5 @@
+name: BunnyAPI
+version: '1.0-SNAPSHOT'
+main: dev.motomoto.bunnyAPI.BunnyAPI
+api-version: '1.21'
+author: motomoto
