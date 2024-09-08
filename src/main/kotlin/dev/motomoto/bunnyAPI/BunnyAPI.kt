@@ -1,5 +1,7 @@
+// src/main/kotlin/dev/motomoto/bunnyAPI/BunnyAPI.kt
 package dev.motomoto.bunnyAPI
 
+import org.bukkit.plugin.java.JavaPlugin
 import api.DataHandleSimpleArgs
 import api.DataHandleSimpleDelete
 import api.DataHandleSimpleNullCheck
@@ -7,7 +9,7 @@ import api.MySQLSimpleHandle
 import service.FileService
 import service.FileServiceImpl
 
-class BunnyAPI public constructor() {
+class BunnyAPI : JavaPlugin() {
 
     val fileService: FileService = FileServiceImpl()
     val dataHandleSimpleArgs: DataHandleSimpleArgs = DataHandleSimpleArgs(fileService)
@@ -23,6 +25,18 @@ class BunnyAPI public constructor() {
             instance ?: synchronized(this) {
                 instance ?: BunnyAPI().also { instance = it }
             }
+    }
+
+    override fun onEnable() {
+        instance = this
+        // Plugin startup logic
+        logger.info("BunnyAPI has been enabled!")
+    }
+
+    override fun onDisable() {
+        // Plugin shutdown logic
+        logger.info("BunnyAPI has been disabled!")
+        instance = null
     }
 
     fun retrieveFileService(): FileService {
