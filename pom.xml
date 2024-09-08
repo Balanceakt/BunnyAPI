@@ -5,7 +5,7 @@
 
     <groupId>dev.motomoto.bunnyAPI</groupId>
     <artifactId>BunnyAPI</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <packaging>jar</packaging>
 
     <name>BunnyAPI</name>
@@ -59,6 +59,10 @@
             <id>sonatype</id>
             <url>https://oss.sonatype.org/content/groups/public/</url>
         </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -85,5 +89,9 @@
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
+        <snapshotRepository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </snapshotRepository>
     </distributionManagement>
 </project>
