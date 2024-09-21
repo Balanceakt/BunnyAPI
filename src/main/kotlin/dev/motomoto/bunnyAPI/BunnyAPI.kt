@@ -22,21 +22,37 @@ class BunnyAPI : JavaPlugin() {
         private var instance: BunnyAPI? = null
 
         fun getInstance(): BunnyAPI =
-            instance ?: synchronized(this) {
-                instance ?: BunnyAPI().also { instance = it }
+            instance ?: throw IllegalStateException("BunnyAPI is not initialized")
+
+        fun initialize(plugin: BunnyAPI) {
+            synchronized(this) {
+                if (instance == null) {
+                    instance = plugin
+                } else {
+                    throw IllegalStateException("BunnyAPI is already initialized")
+                }
             }
+        }
+
+        fun clearInstance() {
+            instance = null
+        }
     }
 
     override fun onEnable() {
-        instance = this
-        // Plugin startup logic
-        logger.info("BunnyAPI has been enabled!")
+        if (instance == null) {
+            initialize(this)
+            // Plugin startup logic
+            logger.info("BunnyAPI has been enabled!")
+        } else {
+            logger.warning("BunnyAPI is already initialized!")
+        }
     }
 
     override fun onDisable() {
         // Plugin shutdown logic
         logger.info("BunnyAPI has been disabled!")
-        instance = null
+        clearInstance()
     }
 
     fun retrieveFileService(): FileService {
