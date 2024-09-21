@@ -40,13 +40,9 @@ class BunnyAPI : JavaPlugin() {
     }
 
     override fun onEnable() {
-        if (instance == null) {
-            initialize(this)
-            // Plugin startup logic
-            logger.info("BunnyAPI has been enabled!")
-        } else {
-            logger.warning("BunnyAPI is already initialized!")
-        }
+        initialize(this)
+        // Plugin startup logic
+        logger.info("BunnyAPI has been enabled!")
     }
 
     override fun onDisable() {
