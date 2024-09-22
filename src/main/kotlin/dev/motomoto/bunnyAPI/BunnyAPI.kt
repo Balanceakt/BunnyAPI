@@ -17,19 +17,29 @@ class BunnyAPI : JavaPlugin() {
     val dataHandleSimpleNullCheck: DataHandleSimpleNullCheck = DataHandleSimpleNullCheck(fileService)
     val mySQLSimpleHandle: MySQLSimpleHandle = MySQLSimpleHandle()
 
+    companion object {
+        @Volatile
+        private var instance: BunnyAPI? = null
+
+        fun getInstance(): BunnyAPI =
+            instance ?: synchronized(this) {
+                instance ?: BunnyAPI().also { instance = it }
+            }
+    }
+
     override fun onEnable() {
         instance = this
-        // Plugin-Startlogik
-        logger.info("BunnyAPI wurde aktiviert!")
+        // Plugin startup logic
+        logger.info("BunnyAPI has been enabled!")
     }
 
     override fun onDisable() {
-        // Plugin-Abschaltlogik
-        logger.info("BunnyAPI wurde deaktiviert!")
+        // Plugin shutdown logic
+        logger.info("BunnyAPI has been disabled!")
+        instance = null
     }
 
-    companion object {
-        lateinit var instance: BunnyAPI
-            private set
+    fun retrieveFileService(): FileService {
+        return fileService
     }
 }
