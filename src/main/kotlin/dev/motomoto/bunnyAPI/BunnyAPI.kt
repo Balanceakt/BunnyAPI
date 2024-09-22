@@ -11,76 +11,51 @@ import service.FileServiceImpl
 class BunnyAPI : JavaPlugin() {
 
     // Initialisiere die Services und Handler
-    val fileService: FileService = FileServiceImpl()
-    val dataHandleSimpleArgs: DataHandleSimpleArgs = DataHandleSimpleArgs(fileService)
-    val dataHandleSimpleDelete: DataHandleSimpleDelete = DataHandleSimpleDelete(fileService)
-    val dataHandleSimpleNullCheck: DataHandleSimpleNullCheck = DataHandleSimpleNullCheck(fileService)
-    val mySQLSimpleHandle: MySQLSimpleHandle = MySQLSimpleHandle()
-
-    // Map zur Speicherung der Instanzen
-    private val instances: MutableMap<String, Any> = mutableMapOf()
-
-    init {
-        // Speichere die Instanzen in der Map
-        instances[DataHandleSimpleArgs::class.java.simpleName] = dataHandleSimpleArgs
-        instances[DataHandleSimpleDelete::class.java.simpleName] = dataHandleSimpleDelete
-        instances[DataHandleSimpleNullCheck::class.java.simpleName] = dataHandleSimpleNullCheck
-        instances[MySQLSimpleHandle::class.java.simpleName] = mySQLSimpleHandle
-    }
+    private val fileService: FileService = FileServiceImpl()
+    private val dataHandleSimpleArgs: DataHandleSimpleArgs = DataHandleSimpleArgs(fileService)
+    private val dataHandleSimpleDelete: DataHandleSimpleDelete = DataHandleSimpleDelete(fileService)
+    private val dataHandleSimpleNullCheck: DataHandleSimpleNullCheck = DataHandleSimpleNullCheck(fileService)
+    private val mySQLSimpleHandle: MySQLSimpleHandle = MySQLSimpleHandle()
 
     companion object {
         @Volatile
         private var instance: BunnyAPI? = null
 
-        // Stelle sicher, dass die API von anderen Plugins aufgerufen werden kann
+        // Zugriff auf die Instanz der BunnyAPI
         fun getInstance(): BunnyAPI =
             instance ?: synchronized(this) {
                 instance ?: BunnyAPI().also { instance = it }
             }
+
+        // Direkter Zugriff auf die Handler
+        fun argsInstance(): DataHandleSimpleArgs {
+            return instance?.dataHandleSimpleArgs ?: throw IllegalStateException("BunnyAPI is not initialized")
+        }
+
+        fun deleteInstance(): DataHandleSimpleDelete {
+            return instance?.dataHandleSimpleDelete ?: throw IllegalStateException("BunnyAPI is not initialized")
+        }
+
+        fun nullCheckInstance(): DataHandleSimpleNullCheck {
+            return instance?.dataHandleSimpleNullCheck ?: throw IllegalStateException("BunnyAPI is not initialized")
+        }
+
+        fun mySQLInstance(): MySQLSimpleHandle {
+            return instance?.mySQLSimpleHandle ?: throw IllegalStateException("BunnyAPI is not initialized")
+        }
+
+        fun retrieveFileService(): FileService {
+            return instance?.fileService ?: throw IllegalStateException("BunnyAPI is not initialized")
+        }
     }
 
     override fun onEnable() {
         instance = this
-        init()
         logger.info("BunnyAPI has been enabled!")
     }
 
     override fun onDisable() {
         logger.info("BunnyAPI has been disabled!")
         instance = null
-    }
-
-    // Initialisiere die API und registriere alle Klassen
-    private fun init() {
-        registerClass(dataHandleSimpleArgs)
-        registerClass(dataHandleSimpleDelete)
-        registerClass(dataHandleSimpleNullCheck)
-        registerClass(mySQLSimpleHandle)
-    }
-
-    // Registriere eine Klasse und gib eine Logmeldung aus
-    private fun registerClass(instance: Any) {
-        logger.info("BunnyAPI: Registered - ${instance.javaClass.name}")
-    }
-
-    // Beispielmethoden zum Abrufen von Instanzen
-    fun argsInstance(): DataHandleSimpleArgs {
-        return instances[DataHandleSimpleArgs::class.java.simpleName] as DataHandleSimpleArgs
-    }
-
-    fun deleteInstance(): DataHandleSimpleDelete {
-        return instances[DataHandleSimpleDelete::class.java.simpleName] as DataHandleSimpleDelete
-    }
-
-    fun nullCheckInstance(): DataHandleSimpleNullCheck {
-        return instances[DataHandleSimpleNullCheck::class.java.simpleName] as DataHandleSimpleNullCheck
-    }
-
-    fun mySQLInstance(): MySQLSimpleHandle {
-        return instances[MySQLSimpleHandle::class.java.simpleName] as MySQLSimpleHandle
-    }
-
-    fun retrieveFileService(): FileService {
-        return fileService
     }
 }
