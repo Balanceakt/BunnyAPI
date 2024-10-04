@@ -11,11 +11,11 @@ import service.FileServiceImpl
 class BunnyAPI : JavaPlugin() {
 
     // Initialisiere die Services und Handler
-    private val fileService: FileService = FileServiceImpl()
-    private val dataHandleSimpleArgs: DataHandleSimpleArgs = DataHandleSimpleArgs(fileService)
-    private val dataHandleSimpleDelete: DataHandleSimpleDelete = DataHandleSimpleDelete(fileService)
-    private val dataHandleSimpleNullCheck: DataHandleSimpleNullCheck = DataHandleSimpleNullCheck(fileService)
-    private val mySQLSimpleHandle: MySQLSimpleHandle = MySQLSimpleHandle()
+    private lateinit var fileService: FileService
+    private lateinit var dataHandleSimpleArgs: DataHandleSimpleArgs
+    private lateinit var dataHandleSimpleDelete: DataHandleSimpleDelete
+    private lateinit var dataHandleSimpleNullCheck: DataHandleSimpleNullCheck
+    private lateinit var mySQLSimpleHandle: MySQLSimpleHandle
 
     companion object {
         @Volatile
@@ -23,34 +23,39 @@ class BunnyAPI : JavaPlugin() {
 
         // Zugriff auf die Instanz der BunnyAPI
         fun getInstance(): BunnyAPI =
-            instance ?: synchronized(this) {
-                instance ?: BunnyAPI().also { instance = it }
-            }
+            instance ?: throw IllegalStateException("BunnyAPI is not initialized")
 
         // Direkter Zugriff auf die Handler
         fun argsInstance(): DataHandleSimpleArgs {
-            return instance?.dataHandleSimpleArgs ?: throw IllegalStateException("BunnyAPI is not initialized")
+            return getInstance().dataHandleSimpleArgs
         }
 
         fun deleteInstance(): DataHandleSimpleDelete {
-            return instance?.dataHandleSimpleDelete ?: throw IllegalStateException("BunnyAPI is not initialized")
+            return getInstance().dataHandleSimpleDelete
         }
 
         fun nullCheckInstance(): DataHandleSimpleNullCheck {
-            return instance?.dataHandleSimpleNullCheck ?: throw IllegalStateException("BunnyAPI is not initialized")
+            return getInstance().dataHandleSimpleNullCheck
         }
 
         fun mySQLInstance(): MySQLSimpleHandle {
-            return instance?.mySQLSimpleHandle ?: throw IllegalStateException("BunnyAPI is not initialized")
+            return getInstance().mySQLSimpleHandle
         }
 
         fun retrieveFileService(): FileService {
-            return instance?.fileService ?: throw IllegalStateException("BunnyAPI is not initialized")
+            return getInstance().fileService
         }
     }
 
     override fun onEnable() {
+        // Initialisiere die Dienste in onEnable()
         instance = this
+        fileService = FileServiceImpl()
+        dataHandleSimpleArgs = DataHandleSimpleArgs(fileService)
+        dataHandleSimpleDelete = DataHandleSimpleDelete(fileService)
+        dataHandleSimpleNullCheck = DataHandleSimpleNullCheck(fileService)
+        mySQLSimpleHandle = MySQLSimpleHandle()
+
         logger.info("BunnyAPI has been enabled!")
     }
 
