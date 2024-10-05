@@ -7,6 +7,7 @@ import api.DataHandleSimpleNullCheck
 import api.MySQLSimpleHandle
 import service.FileService
 import service.FileServiceImpl
+import java.util.concurrent.ConcurrentHashMap
 
 class BunnyAPI : JavaPlugin() {
 
@@ -17,38 +18,38 @@ class BunnyAPI : JavaPlugin() {
     private lateinit var dataHandleSimpleNullCheck: DataHandleSimpleNullCheck
     private lateinit var mySQLSimpleHandle: MySQLSimpleHandle
 
+    // HashMap zum Speichern von Instanzen
+    private val instances: MutableMap<String, Any> = ConcurrentHashMap()
+
     companion object {
         @Volatile
         private var instance: BunnyAPI? = null
 
-        // Zugriff auf die Instanz der BunnyAPI
         fun getInstance(): BunnyAPI =
             instance ?: throw IllegalStateException("BunnyAPI is not initialized")
 
-        // Direkter Zugriff auf die Handler
         fun argsInstance(): DataHandleSimpleArgs {
-            return getInstance().dataHandleSimpleArgs
+            return getInstance().instances["DataHandleSimpleArgs"] as DataHandleSimpleArgs
         }
 
         fun deleteInstance(): DataHandleSimpleDelete {
-            return getInstance().dataHandleSimpleDelete
+            return getInstance().instances["DataHandleSimpleDelete"] as DataHandleSimpleDelete
         }
 
         fun nullCheckInstance(): DataHandleSimpleNullCheck {
-            return getInstance().dataHandleSimpleNullCheck
+            return getInstance().instances["DataHandleSimpleNullCheck"] as DataHandleSimpleNullCheck
         }
 
         fun mySQLInstance(): MySQLSimpleHandle {
-            return getInstance().mySQLSimpleHandle
+            return getInstance().instances["MySQLSimpleHandle"] as MySQLSimpleHandle
         }
 
         fun retrieveFileService(): FileService {
-            return getInstance().fileService
+            return getInstance().instances["FileService"] as FileService
         }
     }
 
     override fun onEnable() {
-        // Initialisiere die Dienste in onEnable()
         instance = this
         fileService = FileServiceImpl()
         dataHandleSimpleArgs = DataHandleSimpleArgs(fileService)
@@ -56,11 +57,18 @@ class BunnyAPI : JavaPlugin() {
         dataHandleSimpleNullCheck = DataHandleSimpleNullCheck(fileService)
         mySQLSimpleHandle = MySQLSimpleHandle()
 
+        instances["FileService"] = fileService
+        instances["DataHandleSimpleArgs"] = dataHandleSimpleArgs
+        instances["DataHandleSimpleDelete"] = dataHandleSimpleDelete
+        instances["DataHandleSimpleNullCheck"] = dataHandleSimpleNullCheck
+        instances["MySQLSimpleHandle"] = mySQLSimpleHandle
+
         logger.info("BunnyAPI has been enabled!")
     }
 
     override fun onDisable() {
         logger.info("BunnyAPI has been disabled!")
         instance = null
+        instances.clear()
     }
 }
